@@ -59,7 +59,12 @@ def writeDACFile(fname, codeseq) :
                 padding=True,
                 dac_version='1.0.0'
             )
+        
         # Save to disk
+        directory = os.path.dirname(fname)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+            print(f'Just so ya know, I had to create the path to save the file')
         dac_file.save(fname + ".dac")
         
 

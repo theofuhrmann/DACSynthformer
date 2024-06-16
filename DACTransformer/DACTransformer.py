@@ -20,7 +20,7 @@ class RotaryPositionalEmbedding(nn.Module):
 
         x_sin = x[:, :, :d//2] * sin_part - x[:, :, d//2:] * cos_part
         x_cos = x[:, :, :d//2] * cos_part + x[:, :, d//2:] * sin_part
-
+        
         return torch.cat((x_sin, x_cos), dim=-1)
 
 # Multiembedding Layer
@@ -39,9 +39,12 @@ class MultiEmbedding(nn.Module):
 #input_size is embed_size+conditioning vector size.
 
 class TransformerBlock(nn.Module):
-    def __init__(self, input_size, embed_size, forward_expansion, heads, dropout):
+    def __init__(self, input_size, embed_size, forward_expansion, heads, dropout, verbose=0):
         super().__init__()
-        #print(f'TBLOCK 0 (init) , input_size is {input_size}, embed_size is {embed_size}')
+        
+        self.verbose=verbose
+        if verbose >0 : 
+            print(f'TBLOCK 0 (init) , input_size is {input_size}, embed_size is {embed_size}')
         self.attention = nn.MultiheadAttention(embed_dim=input_size, num_heads=heads, dropout=dropout, batch_first=True)
         self.norm1 = nn.LayerNorm(input_size)
         
@@ -60,19 +63,24 @@ class TransformerBlock(nn.Module):
         self.norm2 = nn.LayerNorm(embed_size)
 
     def forward(self, src, mask):
-        #print(f'TBLOCK 1, src.shape is {src.shape}')
+        if self.verbose >0 : 
+            print(f'TBLOCK 1, src.shape is {src.shape}')
         attn_output, _ = self.attention(src, src, src, attn_mask=mask)
-        #print(f'TBLOCK 2, attn_output.shape is {attn_output.shape}')
+        if self.verbose >0 : 
+            print(f'TBLOCK 2, attn_output.shape is {attn_output.shape}')
         src = self.norm1(src + self.dropout(attn_output)) # residual connection from src
         
         if self.linear1 != None : 
             src = self.linear1(src)  # Adjust dimension back to embed_size
         
-        #print(f'TBLOCK 3, src.shape is {src.shape}')
+        if self.verbose >0 : 
+            print(f'TBLOCK 3, src.shape is {src.shape}')
         ff_output = self.feed_forward(src)
-        #print(f'TBLOCK 4, ff_output.shape is {ff_output.shape}')
+        if self.verbose >0 : 
+            print(f'TBLOCK 4, ff_output.shape is {ff_output.shape}')
         src = self.norm2(src + self.dropout(ff_output))   # residual connection from src
-        #print(f'TBLOCK 5, src.shape is {src.shape}')
+        if self.verbose >0 : 
+            print(f'TBLOCK 5, src.shape is {src.shape}')
         return src
     
     
@@ -99,9 +107,10 @@ class TransformerBlock(nn.Module):
 #-------------------------------------------------------------------
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, embed_size, num_layers, heads, forward_expansion, dropout, max_len, num_codebooks, vocab_size, cond_size):
+    def __init__(self, embed_size, num_layers, heads, forward_expansion, dropout, max_len, num_codebooks, vocab_size, cond_size, verbose=0):
         super().__init__()
         
+        self.verbose=verbose
         self.embed_size = embed_size
         self.cond_size = cond_size
         self.num_layers = num_layers
@@ -116,29 +125,45 @@ class TransformerDecoder(nn.Module):
         print(f'Get a coder with embed_size={embed_size}. cond_size={cond_size}, max_len={max_len}')
         self.pos_encoder = RotaryPositionalEmbedding(embed_size+cond_size, max_len)
         self.layers = nn.ModuleList([
-            TransformerBlock(embed_size + cond_size, embed_size, forward_expansion, heads, dropout) for _ in range(num_layers)
+            TransformerBlock(embed_size + cond_size, embed_size, forward_expansion, heads, dropout, verbose) for _ in range(num_layers)
         ])
         self.output_layer = nn.Linear(embed_size, num_codebooks * vocab_size)
 
+        
     def forward(self, src, cond_expanded, src_mask):
         src = self.embed(src)
-        #print(f'In TransformerDecoder, before concating cond, source.shape is {src.shape}')
+        
+        if (self.verbose > 5) :
+            print(f'In TransformerDecoder, before concating cond, source.shape is {src.shape}')
         
         # Expand and concatenate conditioning vector for the initial input
         #----- cond_expanded = cond.unsqueeze(1).expand(-1, src.size(1), -1)
-        #print(f'In TransformerDecoder, cond_expanded has shape {cond_expanded.shape}')
+        
+        if cond_expanded != None : 
+            if (self.verbose > 5) :
+                print(f'In TransformerDecoder, cond_expanded has shape {cond_expanded.shape}')
+        else :
+            if (self.verbose > 5) :
+                print(f'no conditional expansion of embedding')
 
         
         if cond_expanded != None :  # else unconditional
             src = torch.cat((src, cond_expanded), dim=-1)
         
-        #print(f'In TransformerDecoder, after concatenating src and cond_expanded, source.shape is {src.shape}')
+        if (self.verbose > 5) :
+            print(f'In TransformerDecoder, after concatenating src and cond_expanded, source.shape is {src.shape}')
         
         src = self.pos_encoder(src)
+        
+        if (self.verbose > 5) :
+            print(f'In TransformerDecoder, after positional encodeing, source.shape is {src.shape}')
+
 
         # Pass through each transformer layer, re-concatenating conditioning vector
         # --- for layer in self.layers:
         for i, layer in enumerate(self.layers):
+            if (self.verbose > 0) :
+                print(f'For feeding layer {i}, source.shape is {src.shape}')
             src = layer(src, src_mask)
             if i != len(self.layers) - 1: # don't concat cond data on the last iteration
                 if cond_expanded != None :  # else unconditional

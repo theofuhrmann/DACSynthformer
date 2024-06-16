@@ -40,6 +40,8 @@ def getNumClasses() :
 def onehot(class_name) :
     class_num=class_name_to_int.get(class_name, -1)  # Return -1 if class_name not found
     # Convert to one-hot encoded vector
+    if class_num == -1 : 
+        print(f'class_name not found is {class_name}')
     return F.one_hot(torch.tensor(class_num), num_classes=num_classes).to(torch.float)
 
             
