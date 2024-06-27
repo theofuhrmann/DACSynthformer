@@ -2,3 +2,4 @@
 runs/
 .Trash-*/
 **/__pycache__/
+tfer/

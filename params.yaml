@@ -1,0 +1,31 @@
+experiment: "06.27"
+testsnd: "all" # pistons, wind, applause, bees
+# data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"  ##******* small
+# validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+
+#data_dir=validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"
+#validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+
+data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-train"
+validator_data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-val"
+
+vocab_size: 1024
+num_tokens: 4
+
+cond_params: 1 #1
+tblock_input_size: 256  #embedding+conditioning vect
+
+Ti: 172 # 172 #86
+Tt: 430 # must match the length of the sequences in the batch
+batch_size: 12  #**
+
+
+num_layers: 4 #**
+num_heads: 16 # 8 # embed_size must be divisible by num_heads
+forward_expansion: 4 #4
+dropout_rate: 0.1
+learning_rate: 0.00025
+num_epochs: 400
+
+ErrorLogRate: 2 #10
+checkpoint_interval: 50 # 25
