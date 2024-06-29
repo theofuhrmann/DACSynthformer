@@ -1,4 +1,11 @@
+"""
+In this work, we introduce a novel approach to conditional transformer architectures that leverages class-specific query projections in the attention mechanism. Unlike traditional multi-head attention, where each head uses a single set of learned query, key, and value projections, our method employs multiple class-specific query projections while maintaining shared key and value projections across all classes. This architecture allows for class-dependent attention patterns while still benefiting from the representational power of multi-head attention.
 
+The core innovation lies in how class information is utilized during both training and inference. During training with one-hot class vectors, only the relevant class-specific query projection is effectively used for each input. This encourages each class projection to specialize in attending to features most relevant to its corresponding class. During inference, the model can accept non-one-hot class vectors, enabling a weighted combination of class-specific queries. This mechanism allows for smooth interpolation between class-specific attention patterns, potentially generating novel outputs that blend characteristics of multiple classes.
+
+This approach differs from standard conditional transformers in two key aspects. First, it provides a more granular method of incorporating class information directly into the attention mechanism, rather than relying solely on concatenated class embeddings or global conditioning signals. Second, it offers a natural way to perform "soft" class conditioning during inference, opening up possibilities for controlled generation and smooth transitions between different class-specific behaviors. This architecture aims to enhance the model's ability to generate diverse and controllable outputs, particularly in tasks requiring fine-grained control over generated content or the ability to smoothly transition between different styles or classes.
+
+"""
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
