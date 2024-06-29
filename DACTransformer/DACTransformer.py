@@ -39,13 +39,13 @@ class MultiEmbedding(nn.Module):
 #input_size is embed_size+conditioning vector size.
 
 class TransformerBlock(nn.Module):
-    def __init__(self, input_size, embed_size, forward_expansion, heads, dropout, verbose=0):
+    def __init__(self, input_size, embed_size, forward_expansion, num_heads, dropout, verbose=0):
         super().__init__()
         
         self.verbose=verbose
         if verbose >0 : 
             print(f'TBLOCK 0 (init) , input_size is {input_size}, embed_size is {embed_size}')
-        self.attention = nn.MultiheadAttention(embed_dim=input_size, num_heads=heads, dropout=dropout, batch_first=True)
+        self.attention = nn.MultiheadAttention(embed_dim=input_size, num_heads=num_heads, dropout=dropout, batch_first=True)
         self.norm1 = nn.LayerNorm(input_size)
         
         if input_size != embed_size :  # the difference is the size of the conditional vector
@@ -87,25 +87,26 @@ class TransformerBlock(nn.Module):
 #-------------------------------------------------------------------
 
 class TransformerDecoder(nn.Module):
-    def __init__(self, embed_size, num_layers, heads, forward_expansion, dropout, max_len, num_codebooks, vocab_size, cond_size, verbose=0):
+    def __init__(self, embed_size, num_layers, num_heads, forward_expansion, dropout, max_len, num_classes, num_codebooks, vocab_size, cond_size, verbose=0):
         super().__init__()
         
         self.verbose=verbose
         self.embed_size = embed_size
         self.cond_size = cond_size
         self.num_layers = num_layers
-        self.heads = heads
+        self.num_heads = num_heads
         self.forward_expansion = forward_expansion
         self.dropout = dropout
         self.max_len = max_len  # used for rotary encoder
         self.num_codebooks = num_codebooks
         self.vocab_size = vocab_size
+        self.num_classes = num_classes
         
         self.embed = MultiEmbedding(vocab_size, embed_size // num_codebooks, num_codebooks)  # 2nd arg is embedding size per token
         print(f'Get a coder with embed_size={embed_size}. cond_size={cond_size}, max_len={max_len}')
         self.pos_encoder = RotaryPositionalEmbedding(embed_size+cond_size, max_len)
         self.layers = nn.ModuleList([
-            TransformerBlock(embed_size + cond_size, embed_size, forward_expansion, heads, dropout, verbose) for _ in range(num_layers)
+            TransformerBlock(embed_size + cond_size, embed_size, forward_expansion, num_heads, dropout, verbose) for _ in range(num_layers)
         ])
         self.output_layer = nn.Linear(embed_size, num_codebooks * vocab_size)
 
@@ -146,8 +147,10 @@ class TransformerDecoder(nn.Module):
                 if cond_expanded != None :  # else unconditional
                     src = torch.cat((src, cond_expanded), dim=-1)
         
-        #print(f'NOW get the logits with source.shape = {src.shape}')
+#         print(f'NOW get the logits with source.shape = {src.shape}')
         logits = self.output_layer(src)
+#         print(f'shape of logits from output_layer is {logits.shape}')
+#         print(f'shape of logits returned from transfermer is {logits.view(src.shape[0], src.shape[1], -1, 1024).shape}')
         return logits.view(src.shape[0], src.shape[1], -1, 1024)  # Adjust reshape as needed
     
     

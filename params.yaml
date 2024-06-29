@@ -1,5 +1,5 @@
-experiment: "06.27"
-testsnd: "all" # pistons, wind, applause, bees
+experiment: "06.29"
+testsnd: "" # pistons, wind, applause, bees
 # data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"  ##******* small
 # validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
 
@@ -8,6 +8,8 @@ testsnd: "all" # pistons, wind, applause, bees
 
 data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-train"
 validator_data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-val"
+
+TransformerClass: "ClassConditionedTransformer" # "TransformerDecoder"
 
 vocab_size: 1024
 num_tokens: 4
@@ -24,8 +26,9 @@ num_layers: 4 #**
 num_heads: 16 # 8 # embed_size must be divisible by num_heads
 forward_expansion: 4 #4
 dropout_rate: 0.1
-learning_rate: 0.00025
-num_epochs: 400
+learning_rate: 0.0005
 
-ErrorLogRate: 2 #10
-checkpoint_interval: 50 # 25
+num_epochs: 300
+
+ErrorLogRate: 5 # 2 #10
+checkpoint_interval: 50 # 50 # 25

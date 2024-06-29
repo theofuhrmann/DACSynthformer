@@ -2,8 +2,8 @@ import torch
 import os
 import dac
 
-from DACTransformer.DACTransformer import TransformerDecoder
-
+#from DACTransformer.DACTransformer import TransformerDecoder
+#from DACTransformer.CondQueryTransformer import ClassConditionedTransformer
 
 def save_model(model, inf_context_length, filepath):
     torch.save({
@@ -11,33 +11,35 @@ def save_model(model, inf_context_length, filepath):
         
         'model_state_dict': model.state_dict(),
         'embed_size': model.embed_size,
-        'num_layers': len(model.layers),
-        'num_heads': model.layers[0].attention.num_heads,
-        'forward_expansion': model.layers[0].feed_forward[0].out_features // model.embed_size,
-        'dropout': model.layers[0].dropout.p,
+        'num_layers': model.num_layers, # len(model.layers),
+        'num_heads': model.num_heads, #  model.layers[0].attention.num_heads,
+        'forward_expansion': model.forward_expansion, # model.layers[0].feed_forward[0].out_features // model.embed_size,
+        'dropout': model.dropout, # model.layers[0].dropout.p,
         'max_len': model.max_len, # model.position_embedding.num_embeddings,
         'num_codebooks': model.num_codebooks, 
         'vocab_size': model.vocab_size,
         'cond_size': model.cond_size,
+        'num_classes': model.num_classes,
     }, filepath)
 
 #-----------------------------------------------------
 
-def load_model(filepath):
+def load_model(filepath, TransformerClass):
     checkpoint = torch.load(filepath)  
     inf_context_length = checkpoint['inf_context_length'] # This is used to set the context length for the inference model
     
-    model = TransformerDecoder(
+    model =  TransformerClass(
         embed_size=checkpoint['embed_size'],
         num_layers=checkpoint['num_layers'],
-        heads=checkpoint['num_heads'],
+        num_heads=checkpoint['num_heads'],
         forward_expansion=checkpoint['forward_expansion'],
         dropout=checkpoint['dropout'],
         # This should be the training conext size size it affect the rotary positional encoding, not the conext length itself.
         max_len=checkpoint['max_len'],
         num_codebooks=checkpoint['num_codebooks'],
         vocab_size=checkpoint['vocab_size'],
-        cond_size= checkpoint['cond_size']
+        cond_size= checkpoint['cond_size'],
+        num_classes = checkpoint['num_classes']
     )
     model.load_state_dict(checkpoint['model_state_dict'])
     
