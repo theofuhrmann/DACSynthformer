@@ -9,7 +9,9 @@ docker image build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --
 
 ## Run the docker container
 ~~~
-docker run --ipc=host --gpus "device=0" -it -v $(pwd):/whatever  -v /scratch:/scratch --name dacshynthformer --rm whatever
+docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name dacsynthformer --rm -p 8888:8888 dacsynth
+cd /dactransformer
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root &
 ~~~
 I use scratch as the root directory for data, etc. 
 
