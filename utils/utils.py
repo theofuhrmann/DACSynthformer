@@ -24,8 +24,8 @@ def save_model(model, inf_context_length, filepath):
 
 #-----------------------------------------------------
 
-def load_model(filepath, TransformerClass):
-    checkpoint = torch.load(filepath)  
+def load_model(filepath, TransformerClass, device='cuda'):
+    checkpoint = torch.load(filepath, map_location=device)  
     inf_context_length = checkpoint['inf_context_length'] # This is used to set the context length for the inference model
     
     model =  TransformerClass(

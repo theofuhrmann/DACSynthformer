@@ -4,7 +4,7 @@
 FROM nvcr.io/nvidia/pytorch:22.05-py3
 
 # create a project directory inside user home
-ENV PROJECT_DIR /working
+ENV PROJECT_DIR=/working
 RUN mkdir $PROJECT_DIR
 WORKDIR $PROJECT_DIR
 
@@ -28,7 +28,7 @@ RUN adduser --disabled-password --gecos '' --uid $USER_ID --gid $GROUP_ID user
 USER user
 
 # 
-ENTRYPOINT /usr/bin/bash
+ENTRYPOINT ["/usr/bin/bash"]
 #CMD ["bash"]
 
 # to run (and use /scratch as for data and checkpoints):
