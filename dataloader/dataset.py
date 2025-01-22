@@ -31,6 +31,13 @@ class_name_to_int = {
     'Bar': 5,
     'Baz': 6
 }
+
+int2classname = {
+    0 : 'pistons',
+    1 : 'wind',
+    2 : 'applause',
+    3 : 'bees'
+}
 _, num_classes = list(class_name_to_int.items())[-1] 
 num_classes=num_classes+1
 

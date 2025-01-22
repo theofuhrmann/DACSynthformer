@@ -124,3 +124,36 @@ def interpolate_vectors(v, s):
 # s = [0, 2, 4]
 # result_tensor = interpolate_vectors(v, s)
 # print(result_tensor)
+
+
+def sample_top_n(logits, n):
+    """
+    Select top `n` logits for each token, apply softmax, and sample token indices.
+    
+    Args:
+        logits (torch.Tensor): Tensor of shape (batch_size, 1, num_tokens, vocab_size)
+        n (int): Number of top logits to consider per token.
+        
+    Returns:
+        torch.Tensor: Tensor of sampled token indices with shape (batch_size, num_tokens)
+    """
+    # Ensure the input tensor shape is (batch_size, num_tokens, vocab_size)
+    batch_size, num_tokens, vocab_size = logits.shape
+
+    # Find the top n logits and their indices along the vocabulary dimension
+    top_n_logits, top_n_indices = torch.topk(logits, n, dim=-1)  # Shape: (batch_size, 1, num_tokens, n)
+
+    # Apply softmax to the top n logits
+    top_n_probs = torch.softmax(top_n_logits, dim=-1)  # Shape: (batch_size, 1, num_tokens, n)
+
+    # Sample from the top n probabilities for each token
+    sampled_indices = torch.multinomial(top_n_probs.view(-1, n), 1).squeeze(-1)  # Shape: (batch_size * num_tokens)
+
+    # Map the sampled indices back to the original vocabulary indices
+    sampled_vocab_indices = top_n_indices.view(-1, n).gather(1, sampled_indices.unsqueeze(-1)).squeeze(-1)
+    
+    # Reshape back to (batch_size, num_tokens)
+    sampled_vocab_indices = sampled_vocab_indices.view(batch_size, num_tokens)
+
+    return sampled_vocab_indices
+    
