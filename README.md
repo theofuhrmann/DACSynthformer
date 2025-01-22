@@ -22,3 +22,12 @@ I use scratch as the root directory for data, etc.
 
 Each of the notebooks has a "parameters" section at the top. 
 
+
+
+## Stored weights (checkpoints): 
+If you just want to just explore the inference phase of the model, the weights for a trained model are available here:
+https://lonce.org/downloads/dacsynthformer/runs.zip
+Unzip this file in your main dacsynthformer directory and run first the CKPT2DAC.ipynb and then the DAC2Audio.ipynb notebooks.
+
+The stored model was trained on 4 texture sounds from the syntex data set (Pistons, Wind, Applause, Bees) with one-hot conditioning info for the class, and one continuous parameter for manipulating each sound. You can listen to examples of the sounds without downloading data sets here: https://syntex.sonicthings.org/soundlist
+
