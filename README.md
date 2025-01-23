@@ -25,13 +25,15 @@ jupyter lab &
 > ~~~
 > I use scratch as the root directory for data, etc. 
 
-## There are 3 noteooks:  
+## There are 2 primary notebooks:  
 1) Train.ipynb - this is the main notebook for training the model. The dataloader loads pre-coded DAC files (4 codebooks for 44.1kHz sampled audio). It creates checkpoints that you can use to generate audio. 
-2) CKPT2DAC.ipynb - this notebook takes a checkpoint and generates DAC files of arbitrary length.
-3) DAC2Audio.ipynb - this notebook takes a DAC file and generates a WAV file.
+2) CKPT_DAC_AUDIO.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio. 
 
-Each of the notebooks has a "parameters" section at the top. 
+> And then there are a couple of legacy  notebooks:  
+> 3) CKPT2DAC.ipynb - this notebook takes a checkpoint and generates DAC files of arbitrary length.
+> 4) DAC2Audio.ipynb - this notebook takes a DAC file and generates a WAV file.
 
+Each of the notebooks has a "parameters" section near the top for choosing the model and some parameter that determine the architectore (for training), or some options (for inference).
 
 
 ## Stored weights (checkpoints): 
