@@ -1,0 +1,35 @@
+experiment: "small"
+testsnd: "" # pistons, wind, applause, bees
+# data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"  ##******* small
+# validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+
+#data_dir=validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"
+#validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+
+data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-train"
+validator_data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-val"
+
+TransformerClass: "PostNormCondDACTransformerDecoder" # "ClassConditionedKeyTransformer" # 
+
+vocab_size: 1024
+num_tokens: 4
+
+cond_params: 1 #1 (not counting the classes)
+tblock_input_size: 32 #512  #embedding+conditioning vect
+
+Ti: 86 # 172 #86
+Tt: 430 # must match the length of the sequences in the batch
+batch_size: 8  #**
+
+
+num_layers: 2 #**
+num_heads: 2 #8 # 8 # embed_size must be divisible by num_heads
+forward_expansion: 2 #4 #4
+dropout_rate: 0.2
+learning_rate: 0.0005
+
+num_epochs: 2 ### 800 
+
+ErrorLogRate: 1 ### 10
+checkpoint_interval: 1 ###50 # 25
+
