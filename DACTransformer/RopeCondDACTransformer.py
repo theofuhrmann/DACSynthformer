@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from MultiheadAttentionWithRoPE import MultiheadAttentionWithRoPE
+from .MultiheadAttentionWithRoPE import MultiheadAttentionWithRoPE
 
 """
 In this version of the Transformer, the positional encoding is applied dynamically to the query and key vectors within each Transformer block, as required for Rotary Positional Encoding (RoPE). The redundant RoPE application to the initial embedding has been removed. All other logic, comments, and verbosity remain unchanged.
@@ -55,9 +55,11 @@ class TransformerBlock(nn.Module):
         self.attention = MultiheadAttentionWithRoPE(
             embed_dim=embed_size,
             num_heads=num_heads,
+            rotary_positional_embedding=rotary_positional_embedding,
+            verbose=verbose,
             dropout=dropout,
             bias=True,  # Enable bias
-            rotary_positional_embedding=rotary_positional_embedding
+            batch_first=True
         )
 
         self.norm1 = nn.LayerNorm(embed_size)
@@ -122,11 +124,11 @@ class TransformerBlock(nn.Module):
         return out
 #-------------------------------------------------------------------
 
-class PostNormCondDACTransformerDecoder(nn.Module):
+class RopeCondDACTransformer(nn.Module):
 
     def __init__(self, embed_size, num_layers, num_heads, forward_expansion, dropout, max_len, num_classes, num_codebooks, vocab_size, cond_size, verbose=False):
         # num_classes isn´t used here, but it is in other decoders
-        super(PostNormCondDACTransformerDecoder, self).__init__()
+        super(RopeCondDACTransformer, self).__init__()
         self.embed_size = embed_size
         self.input_size = embed_size + cond_size
         self.num_codebooks = num_codebooks

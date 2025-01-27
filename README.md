@@ -19,7 +19,7 @@ jupyter lab &
 
 > ### Run the docker container
 > ~~~
-> docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name dacsynthformer --rm -p 8888:8888 > dacsynth
+> docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name dacsynthformer --rm -p 8888:8888  dacsynth
 > cd /dactransformer
 > jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root &
 > ~~~
@@ -29,11 +29,16 @@ jupyter lab &
 1) Train.ipynb - this is the main notebook for training the model. The dataloader loads pre-coded DAC files (4 codebooks for 44.1kHz sampled audio). It creates checkpoints that you can use to generate audio. 
 2) CKPT_DAC_AUDIO.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio. 
 
-> And then there are a couple of legacy  notebooks:  
-> 3) CKPT2DAC.ipynb - this notebook takes a checkpoint and generates DAC files of arbitrary length.
-> 4) DAC2Audio.ipynb - this notebook takes a DAC file and generates a WAV file.
-
 Each of the notebooks has a "parameters" section near the top for choosing the model and some parameter that determine the architectore (for training), or some options (for inference).
+
+
+
+## To train:  
+
+1) Edit the parameter file, params.yaml (or make your own)
+2) Open Train.ipynb and set the parameter file name and any other parameters in  
+3) Run all cells
+4) (There is a params_sm.yaml and a test/data folder for running bare minimum config and dataset)
 
 
 ## Stored weights (checkpoints): 
