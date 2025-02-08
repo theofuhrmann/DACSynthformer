@@ -27,16 +27,19 @@ class_name_to_int = {
     'DSWind': 1, 'wind': 1,
     'DSApplause': 2, 'applause': 2,
     'DSBugs': 3, 'bees': 3,
-    'Foo': 4,
-    'Bar': 5,
-    'Baz': 6
+    'ChirpPattern': 4, 'chirps': 4,
+    'TokWotalDuet': 5, 'toks': 5,
+    'DSPeepers': 6, 'peeps': 6
 }
 
 int2classname = {
     0 : 'pistons',
     1 : 'wind',
     2 : 'applause',
-    3 : 'bees'
+    3 : 'bees',
+    4 : 'chirps',
+    5 : 'toks',
+    6 : 'peeps'
 }
 _, num_classes = list(class_name_to_int.items())[-1] 
 num_classes=num_classes+1

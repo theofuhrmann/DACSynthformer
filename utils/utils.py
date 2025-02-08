@@ -47,7 +47,7 @@ def load_model(filepath, TransformerClass, device='cuda'):
     return model, inf_context_length, checkpoint['vocab_size'], checkpoint['num_codebooks'], checkpoint['cond_size'] # used for consructing the initial input window to the model
     
 #----------------------------------------------------------------------    
-# I don't really know how to set these DACFile params, but they are necessary for model.decompress(dacfile) to work
+# I´d like to get some better documentation on these DACFile params, but they are necessary for model.decompress(dacfile) to work
 # 
 def writeDACFile(fname, codeseq) :
     with torch.no_grad(): 
@@ -126,34 +126,42 @@ def interpolate_vectors(v, s):
 # print(result_tensor)
 
 
+#############################################
+import torch
+
 def sample_top_n(logits, n):
     """
-    Select top `n` logits for each token, apply softmax, and sample token indices.
-    
+    Samples from the top-n highest probability logits for each token independently.
+
     Args:
-        logits (torch.Tensor): Tensor of shape (batch_size, 1, num_tokens, vocab_size)
-        n (int): Number of top logits to consider per token.
-        
+        logits (torch.Tensor): Tensor of shape (batch_size, num_tokens, vocab_size).
+        n (int): The number of top values to consider.
+
     Returns:
-        torch.Tensor: Tensor of sampled token indices with shape (batch_size, num_tokens)
+        torch.Tensor: Indices of sampled tokens, shape (batch_size, num_tokens).
     """
-    # Ensure the input tensor shape is (batch_size, num_tokens, vocab_size)
     batch_size, num_tokens, vocab_size = logits.shape
 
-    # Find the top n logits and their indices along the vocabulary dimension
-    top_n_logits, top_n_indices = torch.topk(logits, n, dim=-1)  # Shape: (batch_size, 1, num_tokens, n)
+    # Get the top-n indices and values for each token independently
+    top_n_values, top_n_indices = torch.topk(logits, n, dim=-1)  # Shape: (batch_size, num_tokens, n)
 
-    # Apply softmax to the top n logits
-    top_n_probs = torch.softmax(top_n_logits, dim=-1)  # Shape: (batch_size, 1, num_tokens, n)
+    # Convert top-n logits to probabilities using softmax
+    top_n_probs = torch.nn.functional.softmax(top_n_values, dim=-1) # Shape: (ntokens, topn)
 
-    # Sample from the top n probabilities for each token
-    sampled_indices = torch.multinomial(top_n_probs.view(-1, n), 1).squeeze(-1)  # Shape: (batch_size * num_tokens)
+    # Sample from the top-n probabilities for each token independently
+    sampled_idx = torch.multinomial(top_n_probs.view(batch_size * num_tokens, n), num_samples=1)  # Shape: (ntokens, 1)
 
-    # Map the sampled indices back to the original vocabulary indices
-    sampled_vocab_indices = top_n_indices.view(-1, n).gather(1, sampled_indices.unsqueeze(-1)).squeeze(-1)
-    
     # Reshape back to (batch_size, num_tokens)
-    sampled_vocab_indices = sampled_vocab_indices.view(batch_size, num_tokens)
+    sampled_idx = sampled_idx.view(batch_size, num_tokens)
 
-    return sampled_vocab_indices
-    
+    # Map sampled indices back to original vocabulary indices
+    return torch.gather(top_n_indices, -1, sampled_idx.unsqueeze(-1)).squeeze(-1)  # Shape: (batch_size, num_tokens)
+
+# # Example usage
+# batch_size, num_tokens, vocab_size = 2, 5, 10
+# logits = torch.randn(batch_size, num_tokens, vocab_size)  # Simulated logits
+# n = 3
+# sampled_tokens = sample_top_n(logits, n)
+# print(sampled_tokens.shape)  # Expected shape: (batch_size, num_tokens)
+# print(sampled_tokens)  # Indices sampled from the top-n choices for each token
+

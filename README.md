@@ -14,12 +14,13 @@ jupyter lab &
 
 > ### Create the docker container  
 > ~~~
-> docker image build --build-arg USER_ID=$(id -u) --build-arg > GROUP_ID=$(id -g) --file Dockerfile.txt --tag whatever .
+> #updated Feb 8, 2025 to use docker buildx:
+> docker buildx build --build-arg USER_ID=$(id -u) --build-arg GROUP_ID=$(id -g) --file Dockerfile.txt --tag yourtag --load .
 > ~~~
 
 > ### Run the docker container
 > ~~~
-> docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name dacsynthformer --rm -p 8888:8888  dacsynth
+> docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name callitwhatyouwill --rm -p 8888:8888  yourtag
 > cd /dactransformer
 > jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root &
 > ~~~
@@ -27,7 +28,7 @@ jupyter lab &
 
 ## There are 2 primary notebooks:  
 1) Train.ipynb - this is the main notebook for training the model. The dataloader loads pre-coded DAC files (4 codebooks for 44.1kHz sampled audio). It creates checkpoints that you can use to generate audio. 
-2) CKPT_DAC_AUDIO.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio. 
+2) CKPT_DAC_AUDIO7.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio. 
 
 Each of the notebooks has a "parameters" section near the top for choosing the model and some parameter that determine the architectore (for training), or some options (for inference).
 
@@ -54,5 +55,5 @@ Unzip this file in your main dacsynthformer directory and run first the CKPT2DAC
 
 The stored model was trained on 4 texture sounds from the syntex data set (Pistons, Wind, Applause, Bees) with one-hot conditioning info for the class, and one continuous parameter for manipulating each sound. You can listen to examples of the sounds without downloading the audio data sets here: https://syntex.sonicthings.org/soundlist
 
-A larger data set of DAC toenized  files will be available shortly.
+A larger data set of DAC tokenized  files will be available shortly.
 

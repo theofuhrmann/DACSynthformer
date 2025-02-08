@@ -1,13 +1,13 @@
-experiment: "01.27.new.rope_bigmodel"
-testsnd: "" # pistons, wind, applause, bees
-# data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"  ##******* small
-# validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+experiment: "02.05.sm.rope"
+testsnd: "" # pistons, wind, applause, bees, chirp, toks, peep
 
-#data_dir=validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-train-small"
-#validator_data_dir="/scratch/syntex/PisWinAppBee_long_44/onesnddac/"+testsnd+"-val-small"
+# for docker:
+# data_dir: "/scratch/syntexnew/dacdata7/train_sm"
+# validator_data_dir: "/scratch/syntexnew/dacdata7/val"
 
-data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-train"
-validator_data_dir: "/scratch/syntex/PisWinAppBee_long_44/dac-val"
+data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/train_sm"
+validator_data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/val"
+
 
 TransformerClass: "PostNormCondDACTransformerDecoder" # "ClassConditionedKeyTransformer" # 
 
@@ -17,12 +17,12 @@ num_tokens: 4
 cond_params: 1 #1 (not counting the classes)
 tblock_input_size: 512  #embedding+conditioning vect
 
-Ti: 172 # 172 #86
+Ti: 86 # 172 #86
 Tt: 430 # must match the length of the sequences in the batch
 batch_size: 8  #**
 
 
-num_layers: 4 #**
+num_layers: 2 #**
 num_heads: 8 # 8 # embed_size must be divisible by num_heads
 forward_expansion: 4 #4
 dropout_rate: 0.2
@@ -30,6 +30,6 @@ learning_rate: 0.0005
 
 num_epochs: 201 ### 800 
 
-ErrorLogRate: 10 ### 10
-checkpoint_interval: 50 ###50 # 25
+ErrorLogRate: 25 ### 10
+checkpoint_interval: 20 ###50 # 25
 
