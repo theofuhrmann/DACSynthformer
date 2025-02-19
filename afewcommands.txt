@@ -1,0 +1,14 @@
+
+# fire up the docker:
+docker run --ipc=host --gpus all -it -v $(pwd):/dacsynthformer  -v /home/lonce/scratchdata:/scratch --name dacsynth13 --rm -p 8888:8888  dacsynth13
+
+# (inside docker, port should match the mapped port in the docker call)
+jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root &
+
+# Best to encode in the same environment as you decode - otherwise you could end up with different DACs from Descript
+# (in docker container) To encode a directory of wav files to a directory of dac files:
+python3 -m dac encode /scratch/syntexnew/dacdata7wav/train --model_bitrate 8kbps --n_quantizers 4 --output /scratch/syntexnew/dacdata7/train
+
+
+
+python3 -m dac encode /scratch/syntexnew/DS_BasicFM_1.1/newDataset --model_bitrate 8kbps --n_quantizers 4 --output scratch/syntexnew/DS_BasicFM_1.1/dacDataset

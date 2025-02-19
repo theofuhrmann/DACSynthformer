@@ -27,7 +27,8 @@ class_name_to_int = {
     'DSWind': 1, 'wind': 1,
     'DSApplause': 2, 'applause': 2,
     'DSBugs': 3, 'bees': 3,
-    'ChirpPattern': 4, 'chirps': 4,
+    #'ChirpPattern': 4, 'chirps': 4,
+    'FM': 4, 'fm': 4,
     'TokWotalDuet': 5, 'toks': 5,
     'DSPeepers': 6, 'peeps': 6
 }
@@ -37,7 +38,8 @@ int2classname = {
     1 : 'wind',
     2 : 'applause',
     3 : 'bees',
-    4 : 'chirps',
+    #4 : 'chirps',
+    4 : 'fm',
     5 : 'toks',
     6 : 'peeps'
 }

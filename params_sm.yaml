@@ -1,4 +1,4 @@
-experiment: "smalltest"
+experiment: "smalltest2"
 
 data_dir: "testdata/dac-train"
 validator_data_dir: "testdata/dac-val"
