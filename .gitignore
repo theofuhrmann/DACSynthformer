@@ -5,3 +5,4 @@ runs.zip
 **/__pycache__/
 tfer/
 3.*
+private/

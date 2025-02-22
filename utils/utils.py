@@ -5,11 +5,12 @@ import dac
 #from DACTransformer.DACTransformer import TransformerDecoder
 #from DACTransformer.CondQueryTransformer import ClassConditionedTransformer
 
-def save_model(model, inf_context_length, filepath):
+def save_model(model, optimizer, inf_context_length, filepath):
     torch.save({
-        'inf_context_length': inf_context_length,
-        
         'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+
+        'inf_context_length': inf_context_length,
         'embed_size': model.embed_size,
         'num_layers': model.num_layers, # len(model.layers),
         'num_heads': model.num_heads, #  model.layers[0].attention.num_heads,
@@ -42,9 +43,11 @@ def load_model(filepath, TransformerClass, device='cuda'):
         num_classes = checkpoint['num_classes']
     )
     model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer = torch.optim.Adam(model.parameters())
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict']) #also restored lr
     
     model.eval()
-    return model, inf_context_length, checkpoint['vocab_size'], checkpoint['num_codebooks'], checkpoint['cond_size'] # used for consructing the initial input window to the model
+    return model, optimizer, inf_context_length, checkpoint['vocab_size'], checkpoint['num_codebooks'], checkpoint['cond_size'] # used for consructing the initial input window to the model
     
 #----------------------------------------------------------------------    
 # I´d like to get some better documentation on these DACFile params, but they are necessary for model.decompress(dacfile) to work

@@ -1,9 +1,9 @@
-experiment: "smalltest10"
+experiment: "minitest11"
 
-data_dir: "private/testdata/train_sm_xxx"
-data_frames: "private/testdata/train_sm_xxx.xlsx"
-validator_data_dir: "private/testdata/val_xxx"
-validator_data_frames: "private/testdata/val_xxx.xlsx"
+data_dir: "private/testdata/train_mini"
+data_frames: "private/testdata/train_mini.xlsx"
+validator_data_dir: "private/testdata/val_mini"
+validator_data_frames: "private/testdata/val_mini.xlsx"
 
 TransformerClass: "RopeCondDACTransformer" # "PostNormCondDACTransformerDecoder" #  "ClassConditionedKeyTransformer" # 
 
@@ -24,8 +24,8 @@ forward_expansion: 2 #4 #4
 dropout_rate: 0.2
 learning_rate: 0.0005
 
-num_epochs: 90 ### 800 
+num_epochs: 10 ### 800 
 
-ErrorLogRate: 1 ### 10
+ErrorLogRate: 2 ### 10
 checkpoint_interval: 5 ###50 # 25
 
