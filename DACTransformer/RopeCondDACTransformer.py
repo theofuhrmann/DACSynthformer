@@ -143,6 +143,10 @@ class RopeCondDACTransformer(nn.Module):
         self.num_classes = num_classes
         self.num_layers = num_layers
 
+        temp_head_dim = self.embed_size // num_heads
+        print(f" ------------- embed_dim ({self.embed_size}) must be divisible by num_heads ({num_heads})")
+        assert temp_head_dim * num_heads == self.embed_size, f"embed_dim ({self.embed_size}) must be divisible by num_heads ({num_heads})"
+
         print(f"Setting up MultiEmbedding with vocab_size= {vocab_size}, embed_size= {embed_size}, num_codebooks= {num_codebooks}")
         self.multi_embedding = MultiEmbedding(vocab_size, embed_size // num_codebooks, num_codebooks)
         print(f"Setting up RotaryPositionalEmbedding with embed_size= {embed_size}, max_len= {max_len}")        

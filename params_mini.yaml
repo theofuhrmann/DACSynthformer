@@ -1,9 +1,14 @@
-experiment: "minitest11"
+experiment: "mini_classnum_test_01"
+
+# data_dir: "private/testdata/train_mini"
+# data_frames: "private/testdata/train_mini.xlsx"
+# validator_data_dir: "private/testdata/val_mini"
+# validator_data_frames: "private/testdata/val_mini.xlsx"
 
 data_dir: "private/testdata/train_mini"
-data_frames: "private/testdata/train_mini.xlsx"
+data_frames: "private/testdata/train_mini_classnum_test.xlsx"
 validator_data_dir: "private/testdata/val_mini"
-validator_data_frames: "private/testdata/val_mini.xlsx"
+validator_data_frames: "private/testdata/val_mini_classnum_test.xlsx"
 
 TransformerClass: "RopeCondDACTransformer" # "PostNormCondDACTransformerDecoder" #  "ClassConditionedKeyTransformer" # 
 
@@ -11,7 +16,8 @@ vocab_size: 1024
 num_tokens: 4
 
 cond_params: 1 #1 (not counting the classes)
-tblock_input_size: 32 #512  #embedding+conditioning vect
+model_size: 32 # must be divisible by num_heads
+tblock_input_size: 35 #512  #embedding+conditioning vect
 
 Ti: 86 # 172 #86
 Tt: 430 # must match the length of the sequences in the batch
