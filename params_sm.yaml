@@ -1,9 +1,15 @@
 experiment: "smalltest100"
 
-data_dir: "private/testdata/train_sm_xxx"
-data_frames: "private/testdata/train_sm_xxx.xlsx"
-validator_data_dir: "private/testdata/val_xxx"
-validator_data_frames: "private/testdata/val_xxx.xlsx"
+# data_dir: "private/testdata/train_sm_xxx"
+# data_frames: "private/testdata/train_sm_xxx.xlsx"
+# validator_data_dir: "private/testdata/val_xxx"
+# validator_data_frames: "private/testdata/val_xxx.xlsx"
+
+data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/all7"
+data_frames: "/home/lonce/scratchdata/syntexnew/dacdata7/train_sm.xlsx"
+validator_data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/all7"
+validator_data_frames: "/home/lonce/scratchdata/syntexnew/dacdata7/train.xlsx"
+
 
 TransformerClass: "RopeCondDACTransformer" # "PostNormCondDACTransformerDecoder" #  "ClassConditionedKeyTransformer" # 
 
@@ -25,7 +31,7 @@ forward_expansion: 3 #4 #4
 dropout_rate: 0.2
 learning_rate: 0.0005
 
-num_epochs: 30 ### 800 
+num_epochs: 5 ### 800 
 
 ErrorLogRate: 1 ### 10
 checkpoint_interval: 5 ###50 # 25

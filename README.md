@@ -34,9 +34,25 @@ Each of the notebooks has a "parameters" section near the top for choosing the m
 
 
 
+## Preparing data: 
+
+The conda and docker environments have already installed the Descript DAC codec package, so you can encode .wav files to .dacs and decode .dac file to .wavs. Just encode a folder of wav files like this:
+
+`python3 -m dac encode /my/wavs/folder --model_bitrate 8kbps --n_quantizers 4 --output my/output/folder/`. For more information about the Descript codec, see:
+
+https://github.com/descriptinc/descript-audio-codec
+
+The prepare your excel data file (that pandas will use). It should have columns, with labels in the first row:
+
+Full File Name     |        Class Name         |    Param1   | ....  | ParamN
+
+The file name includes no path (you provide that in a params.yaml config file). Class Names are whatever you choose. Dacformer will create a separate one-hot class element in the conditioning vector used for training and inference for each unique Class Name. Consider a balance of classes for your training data!
+
+
+
 ## To train:  
 
-1) Edit (or create) a parameter file that you then identify in the training (and inference) notebooks.
+1) Edit (or create) a parameter yaml file that you then must identify in the training (and inference) notebooks.
 2) Open Train.ipynb and set the parameter file name and any other parameters you want (such as  DEVICE). 
 3) Run all cells.
 4) There is a ridiculously tiny data set of dac files in test/data, and three prepared parameter files:

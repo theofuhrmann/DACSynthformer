@@ -7,6 +7,8 @@ torchaudio
 tqdm
 tensorboard
 numba>=0.5.7
+pandas
+openpyxl
 jupyterlab
 
 
