@@ -17,7 +17,7 @@ num_tokens: 4
 
 cond_params: 1 #1 (not counting the classes)
 model_size: 32 # must be divisible by num_heads
-tblock_input_size: 35 #512  #embedding+conditioning vect
+# tblock_input_size: 35 #512  #embedding+conditioning vect
 
 Ti: 86 # 172 #86
 Tt: 430 # must match the length of the sequences in the batch
