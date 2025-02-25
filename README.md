@@ -3,12 +3,17 @@
 DACSynthformer is a basic transformer that runs on the Descript Audio Codec representation of audio. It maintains the "stacked" codebook at each transformer time step (as oppose to laying the codebooks down "horizonally" for examaple). It uses a smallish causal mask during training, so that during autoregressive inference we can use a small context window. It uses RoPE positional encoding because absolute positions are irrelevant for the continuous and stable audio textures we wish to generate. Conditioning is provided as a vector combining a one-hot segment for sound class, and real number(s) for parameters.
 
 ## Install option 1 (conda only) 
+
+This option is perfect for CPU's. You need to have miniconda (or conda) installed: https://docs.anaconda.com/miniconda/install/ . Then:
+
 ~~~
 conda create --name dacformer python==3.10
 conda activate dacformer
 pip install -r requirements.txt
 jupyter lab &
 ~~~
+
+(If you use Windows, I suggest you use a command window and not a powershell window. Sheesh.)
 
 ## Install option 2 (Docker) 
 
@@ -42,12 +47,12 @@ Each of the notebooks has a "**Parameters**" section near the top.
 
 Once you have created and are in your conda (or docker) environment and have started jupyter, just:
 
-* Set paramfile = 'params_mini.yaml' in the "**Parameters**" section of Train.ipynb
-* Run All Cells (params_mini.yaml uses testdata with 4 sounds, and trains on 10 epochs.)
-* Make sure   experiment_name="mini_test_01" in the "**Parameters**" section of Inference.Decode.ipynb, and cptnum=10.  
+* Open Train.ipynb and set paramfile = 'params_mini.yaml' in the "**Parameters**" section.
+* Run All Cells (You can see that params_mini.yaml uses testdata/ with 4 sounds, and trains on 10 epochs.)
+* Then open Inference.Decode.ipynb and set  experiment_name="mini_test_01" in the "**Parameters**" section of , and cptnum=10.  
 * Run All Cells 
 
-This runs a very minimal model, and doesn't train long enough to generate anything but noise. The intention is that you can see that Training and Inference code is functioning!
+This runs a very minimal model, and doesn't train long enough to generate anything but codec noise. The intention is that you can see that Training and Inference code is functioning! When that works, you are ready to start creating a new dataset and exploring the model!
 
 ## Preparing data: 
 
@@ -75,7 +80,7 @@ Note: you typically write a little python program to generate your excel Pandas 
 4) There is a ridiculously tiny data set of dac files in test/data, and a few prepared parameter files:
    1)  params_mini.yaml - for QuickStart and code debugging. Runs all code, but with minimal data and a tiny model.
    2)  params_sm.yaml - good for debugging since it quickly uses all stages of the computation.
-   3)  params_med.yaml - uses a slightly bigger model, and the tiny data set for training period long enough to actually see that training and inference work. This runs in a reasonable time on a cpu (maybe 20 minutes training, 2 minute inference) 
+   3)  params_med.yaml - uses a slightly bigger model, and the tiny data set for training period long enough to actually see that training and inference work. This can also run on a CPU.
    4)  params.yaml - defines a bigger model, and meant for running a larger dataset for many epochs.
 
 
@@ -86,9 +91,9 @@ Note: you typically write a little python program to generate your excel Pandas 
 
 The testdata/ folder has everything you need as a template for creating your own dataset. However, here is a dataset along with a param.yaml file that specifies a medium-size model that you can use for testing, seeing how bi you might want your data and model to be for your own work, etc: 
 
-https://drive.google.com/file/d/1IdMb4v9wD4nHlFLFJe-pl85rFQW0eF-Y/view?usp=sharing
+https://drive.google.com/file/d/1IdMb4v9wD4nHlFLFJe-pl85rFQW0eF-Y/view?usp=sharing It seems you actually have to go to this google drive page and click the download button. 
 
-With this data and model spec, I see training at a rate of about 2 minutes per epoch on a powerful desktop machine (CPU only). You can see that it is training after about 10 epochs, and starting to produce something reasonable for some of the sounds after 30 epochs. Reduce the size of the model for speedier training.
+With this data and model spec, I see training at a rate of about 2 minutes per epoch on a powerful desktop machine (CPU only), and about 7 minutes/epoch on my PC. You can see that it is training after about just 5 epochs (That's 35 minutes on my laptop!), and starting to produce something reasonable for some of the sounds after 20 epochs. Reduce the size of the model for speedier training. Your datasets can be much smaller, though - try just 2 or 3 classes. 
 
 The sounds are from the Syntex sound textures data set syntex data set ( https://syntex.sonicthings.org/soundlist) 
 
@@ -100,7 +105,4 @@ The sounds are from the Syntex sound textures data set syntex data set ( https:/
 * TokWottle, with a 'wood to metal' hit ratio parameter 
 * FM, with a 'modulation frequency' parameter
 
-
-
-
-<!--   https://lonce.org/downloads/dacsynthformer/runs.zip -->
+These sounds all sample their parameter space [0,1] in steps of .05. There are 630 files per sound class (30 5 second samples at each parameter value), totaling about 6 hours of audio. 

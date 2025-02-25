@@ -11,7 +11,7 @@ vocab_size: 1024
 num_tokens: 4
 
 cond_params: 1 #1 (not counting the classes)
-model_size: 32 # must be divisible by num_heads
+model_size: 64 # must be divisible by num_heads
 # tblock_input_size: 35 #512  #embedding+conditioning vect
 
 Ti: 86 # 172 #86
@@ -20,13 +20,13 @@ batch_size: 4  #**
 
 
 num_layers: 2 #**
-num_heads: 2 #8 # 8 # embed_size must be divisible by num_heads
+num_heads: 4 #8 # 8 # embed_size must be divisible by num_heads
 forward_expansion: 2 #4 #4
 dropout_rate: 0.2
 learning_rate: 0.0005
 
 num_epochs: 10 ### 800 
 
-ErrorLogRate: 2 ### 10
+ErrorLogRate: 2 #2 ### 10
 checkpoint_interval: 5 ###50 # 25
 

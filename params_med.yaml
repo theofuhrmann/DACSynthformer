@@ -9,7 +9,7 @@ vocab_size: 1024
 num_tokens: 4
 
 cond_params: 1 #1 (not counting the classes)
-tblock_input_size: 32 #512  #embedding+conditioning vect
+model_size: 64 # must be divisible by num_heads
 
 Ti: 86 # 172 #86
 Tt: 430 # must match the length of the sequences in the batch

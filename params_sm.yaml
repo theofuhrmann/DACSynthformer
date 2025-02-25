@@ -1,19 +1,15 @@
 experiment: "smalltest_dataset"
 
-# data_dir: "private/testdata/train_sm_xxx"
-# data_frames: "private/testdata/train_sm_xxx.xlsx"
-# validator_data_dir: "private/testdata/val_xxx"
-# validator_data_frames: "private/testdata/val_xxx.xlsx"
+# data_dir: "foo/train_sm"
+# data_frames: "foo/train_sm.xlsx"
+# validator_data_dir: "foo/val"
+# validator_data_frames: "foo/val.xlsx"
 
-# data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/all7"
-# data_frames: "/home/lonce/scratchdata/syntexnew/dacdata7/train_sm.xlsx"
-# validator_data_dir: "/home/lonce/scratchdata/syntexnew/dacdata7/all7"
-# validator_data_frames: "/home/lonce/scratchdata/syntexnew/dacdata7/train.xlsx"
-
-data_dir: "foo/train_sm"
-data_frames: "foo/train_sm.xlsx"
-validator_data_dir: "foo/val"
-validator_data_frames: "foo/val.xlsx"
+# forward slashes, even on Windows!
+data_dir: "C:/Lonce/deleteme/smset/smset/train_sm"
+data_frames: "C:/Lonce/deleteme/smset/smset/train_sm.xlsx"
+validator_data_dir: "C:/Lonce/deleteme/smset/smset/val"
+validator_data_frames: "C:/Lonce/deleteme/smset/smset/val.xlsx"
 
 
 TransformerClass: "RopeCondDACTransformer" # "PostNormCondDACTransformerDecoder" #  "ClassConditionedKeyTransformer" # 
