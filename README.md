@@ -80,14 +80,27 @@ Note: you typically write a little python program to generate your excel Pandas 
 
 
 
-## Stored weights (checkpoints): 
-Inference runs fine on a CPU. On a fast linux machine, the combined Transformer inference plus DAC token decoding runs in roughly the same time as the length of the audio you are generating.
+## Optional Info: 
 
-If you just want to explore the inference phase of the model, the weights for a trained model are available here (along with a stored parameter file used to define it):
-https://lonce.org/downloads/dacsynthformer/runs.zip
-Unzip this file in your main dacsynthformer directory and run first the CKPT2DAC.ipynb and then the DAC2Audio.ipynb notebooks, making sure to set the path to the parameter file. 
+* Prepared dataset:
 
-The stored model was trained on 4 texture sounds from the syntex data set (Pistons, Wind, Applause, Bees) with one-hot conditioning info for the class, and one continuous parameter for manipulating each sound. You can listen to examples of the sounds without downloading the audio data sets here: https://syntex.sonicthings.org/soundlist
+The testdata/ folder has everything you need as a template for creating your own dataset. However, here is a dataset along with a param.yaml file that specifies a medium-size model that you can use for testing, seeing how bi you might want your data and model to be for your own work, etc: 
 
-A larger data set of DAC tokenized  files will be available shortly.
+https://drive.google.com/file/d/1IdMb4v9wD4nHlFLFJe-pl85rFQW0eF-Y/view?usp=sharing
 
+With this data and model spec, I see training at a rate of about 2 minutes per epoch on a powerful desktop machine (CPU only). You can see that it is training after about 10 epochs, and starting to produce something reasonable for some of the sounds after 30 epochs. Reduce the size of the model for speedier training.
+
+The sounds are from the Syntex sound textures data set syntex data set ( https://syntex.sonicthings.org/soundlist) 
+
+* Pistons, with a 'rate' parameter,
+*  Wind, with a 'gustiness' parameter
+* Applause, with a 'number of clappers' parameter
+* Bees (bugs , with a 'busy-body' parameter (how fast and far the bees move)
+* Peepers, with a 'frequency range' parameter
+* TokWottle, with a 'wood to metal' hit ratio parameter 
+* FM, with a 'modulation frequency' parameter
+
+
+
+
+<!--   https://lonce.org/downloads/dacsynthformer/runs.zip -->
