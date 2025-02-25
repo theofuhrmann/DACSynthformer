@@ -28,11 +28,26 @@ jupyter lab &
 
 ## There are 2 primary notebooks:  
 1) Train.ipynb - this is the main notebook for training the model. The dataloader loads pre-coded DAC files (4 codebooks for 44.1kHz sampled audio). It creates checkpoints that you can use to generate audio. 
-2) CKPT_DAC_AUDIO7.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio. 
+2) Inference.Decode.ipynb - uses a stored trained model to first generate a DAC coded file and then decodes that to audio with the Descript codec ("DAC"). 
 
-Each of the notebooks has a "parameters" section near the top for choosing the model and some parameter that determine the architectore (for training), or some options (for inference).
+Each of the notebooks has a "**Parameters**" section near the top.
 
+* In Train.ipynb, choose your params.yaml file (which is where most of your model parameters are set). The  "**Parameters**" section also is where you choose the platform ('cpu' or 'cuda') and the starting epoch number (0 unless you want to pick up training where a previous run left off). 
 
+* In Inference.Decode.ipynb, the "**Parameters**" is where you set the "experiment name" to whatever you named your experiment in the params.yaml file you trained with. 
+
+  
+
+## Quick Start:
+
+Once you have created and are in your conda (or docker) environment and have started jupyter, just:
+
+* Set paramfile = 'params_mini.yaml' in the "**Parameters**" section of Train.ipynb
+* Run All Cells (params_mini.yaml uses testdata with 4 sounds, and trains on 10 epochs.)
+* Make sure   experiment_name="mini_test_01" in the "**Parameters**" section of Inference.Decode.ipynb, and cptnum=10.  
+* Run All Cells 
+
+This runs a very minimal model, and doesn't train long enough to generate anything but noise. The intention is that you can see that Training and Inference code is functioning!
 
 ## Preparing data: 
 
@@ -46,19 +61,22 @@ The prepare your excel data file (that pandas will use). It should have columns,
 
 Full File Name     |        Class Name         |    Param1   | ....  | ParamN
 
-The file name includes no path (you provide that in a params.yaml config file). Class Names are whatever you choose. Dacformer will create a separate one-hot class element in the conditioning vector used for training and inference for each unique Class Name. Consider a balance of classes for your training data!
+The file name includes no path (you provide that in a params.yaml config file). Class Names are whatever you choose. Synthformer will create a separate one-hot class element in the conditioning vector used for training and inference for each unique Class Name. (You can see examples of the excel files in testdata). Consider a balance of classes for your training data! 
+
+Note: you typically write a little python program to generate your excel Pandas Frames from your collection of data files. 
 
 
 
 ## To train:  
 
-1) Edit (or create) a parameter yaml file that you then must identify in the training (and inference) notebooks.
-2) Open Train.ipynb and set the parameter file name and any other parameters you want (such as  DEVICE). 
+1) Edit (or create) a parameter.yaml file with model parameters, folder names for your data and file names for the excel Pandas file.  
+2) Open Train.ipynb, set your parameter.yaml file  in the "**Parameters**" section of Training.ipynb and any other parameters you want (such as  DEVICE). 
 3) Run all cells.
-4) There is a ridiculously tiny data set of dac files in test/data, and three prepared parameter files:
-   1)  params_sm.yaml - good for debugging since it quickly uses all stages of the computation.
-   2) params_med.yaml - uses a slightly bigger model, and the tiny data set for training period long enough to actually see that training and inference work. This runs in a reasonable time on a cpu (maybe 20 minutes training, 2 minute inference) 
-   3) params.yaml - defines a bigger model, and meant for running a larger dataset for many epochs.
+4) There is a ridiculously tiny data set of dac files in test/data, and a few prepared parameter files:
+   1)  params_mini.yaml - for QuickStart and code debugging. Runs all code, but with minimal data and a tiny model.
+   2)  params_sm.yaml - good for debugging since it quickly uses all stages of the computation.
+   3)  params_med.yaml - uses a slightly bigger model, and the tiny data set for training period long enough to actually see that training and inference work. This runs in a reasonable time on a cpu (maybe 20 minutes training, 2 minute inference) 
+   4)  params.yaml - defines a bigger model, and meant for running a larger dataset for many epochs.
 
 
 
