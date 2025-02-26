@@ -58,11 +58,15 @@ This runs a very minimal model, and doesn't train long enough to generate anythi
 
 The conda and docker environments have already installed the Descript DAC codec package, so you can encode .wav files to .dacs and decode .dac file to .wavs. Just encode a folder of wav files like this:
 
-`python3 -m dac encode /my/wavs/folder --model_bitrate 8kbps --n_quantizers 4 --output my/output/folder/`. For more information about the Descript codec, see:
+`python3 -m dac encode /my/wavs/folder --model_bitrate 8kbps --n_quantizers 4 --output my/output/folder/.` 
+
+For more information about the Descript codec, see the README here:
 
 https://github.com/descriptinc/descript-audio-codec
 
-The prepare your excel data file (that pandas will use). It should have columns, with labels in the first row:
+Note: All files must be the same length (have the same number of dac frames) and that length will be the context window used for training (I use 5 seconds of audio which the above command converts to 430 dac frames (86 frames/sec). The Tt variable ("T training") must be set in your param yaml file, too. 
+
+Then prepare your excel data file (that pandas will use). It should have columns, with labels in the first row:
 
 Full File Name     |        Class Name         |    Param1   | ....  | ParamN
 
