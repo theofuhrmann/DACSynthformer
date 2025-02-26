@@ -2,9 +2,6 @@ import torch
 import os
 import dac
 
-#from DACTransformer.DACTransformer import TransformerDecoder
-#from DACTransformer.CondQueryTransformer import ClassConditionedTransformer
-
 def save_model(model, optimizer, inf_context_length, filepath):
     torch.save({
         'model_state_dict': model.state_dict(),
@@ -95,42 +92,9 @@ def generate_mask(sz, max_lookback):
 
     return mask
 
-# -----------------------------------------------------------------------
-
-def interpolate_vectors(v, s):
-    assert len(v) == len(s), "List of vectors and list of time indexes must be of the same length."
-    
-    n = len(v[0])  # Length of each vector
-    m = s[-1] + 1  # Last element of s plus one
-    result = torch.zeros((1, m, n))  # Initialize the result tensor with zeros
-    
-    v_tensors = [torch.tensor(vec) for vec in v]
-    
-    for i in range(len(s) - 1):
-        start_idx = s[i]
-        end_idx = s[i + 1]
-        start_vec = v_tensors[i]
-        end_vec = v_tensors[i + 1]
-        
-        for j in range(start_idx, end_idx):
-            t = (j - start_idx) / (end_idx - start_idx)
-            result[0, j, :] = (1 - t) * start_vec + t * end_vec
-    
-    # Set the last vector directly
-    result[0, s[-1], :] = v_tensors[-1]
-    
-    return result
-
-
-# # Example usage
-# v = [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]
-# s = [0, 2, 4]
-# result_tensor = interpolate_vectors(v, s)
-# print(result_tensor)
 
 
 #############################################
-import torch
 
 def sample_top_n(logits, n):
     """
@@ -170,8 +134,42 @@ def sample_top_n(logits, n):
 
 
 ########################################################################################################
-import torch
+# -----------------------------------------------------------------------
+# The following are for creating sequences of parameters for inference
+# -----------------------------------------------------------------------
 
+def interpolate_vectors(v, s):
+    assert len(v) == len(s), "List of vectors and list of time indexes must be of the same length."
+    
+    n = len(v[0])  # Length of each vector
+    m = s[-1] + 1  # Last element of s plus one
+    result = torch.zeros((1, m, n))  # Initialize the result tensor with zeros
+    
+    v_tensors = [torch.tensor(vec) for vec in v]
+    
+    for i in range(len(s) - 1):
+        start_idx = s[i]
+        end_idx = s[i + 1]
+        start_vec = v_tensors[i]
+        end_vec = v_tensors[i + 1]
+        
+        for j in range(start_idx, end_idx):
+            t = (j - start_idx) / (end_idx - start_idx)
+            result[0, j, :] = (1 - t) * start_vec + t * end_vec
+    
+    # Set the last vector directly
+    result[0, s[-1], :] = v_tensors[-1]
+    
+    return result
+
+
+# # Example usage
+# v = [[1.0, 2.0], [3.0, 4.0], [5.0, 6.0]]
+# s = [0, 2, 4]
+# result_tensor = interpolate_vectors(v, s)
+# print(result_tensor)
+
+# -----------------------------------------------------------------------
 def breakpoints(allowed_keys, **kwargs):
     """
     Constructs a list of n tensors (rows) from keyword arguments.
@@ -216,7 +214,7 @@ def breakpoints(allowed_keys, **kwargs):
         tensor_rows.append(torch.tensor(row_values))
     return tensor_rows
 
-#==================================================
+# -----------------------------------------------------------------------
 def timesegs(n):
     """
     Generate a list of time segment boundaries for partitioning the interval [0, 1]
@@ -236,7 +234,7 @@ def timesegs(n):
     tlist.extend([1])
     return tlist
     
-
+# -----------------------------------------------------------------------
 def breakpoints_classseq(class_list, pvals, **kwargs):
     """
     Generates a conditioning sequence and corresponding time segments.

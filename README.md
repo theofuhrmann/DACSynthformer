@@ -89,6 +89,12 @@ Note: you typically write a little python program to generate your excel Pandas 
 
 
 
+Loss is printed to the notebook output window, and to your output directory so that they can be watched using tensorboard (pip install tensorboard), by running:
+
+`tensorboard --logdir=./runs/your_experiment_name  --port=6006`
+
+then point your browser to localhost:6006
+
 ## Optional Info: 
 
 * Prepared dataset:
