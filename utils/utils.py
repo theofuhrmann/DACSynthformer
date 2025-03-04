@@ -1,74 +1,92 @@
-import torch
 import os
+
 import dac
+import torch
+
 
 def save_model(model, optimizer, inf_context_length, filepath):
-    torch.save({
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-
-        'inf_context_length': inf_context_length,
-        'embed_size': model.embed_size,
-        'num_layers': model.num_layers, # len(model.layers),
-        'num_heads': model.num_heads, #  model.layers[0].attention.num_heads,
-        'forward_expansion': model.forward_expansion, # model.layers[0].feed_forward[0].out_features // model.embed_size,
-        'dropout': model.dropout, # model.layers[0].dropout.p,
-        'max_len': model.max_len, # model.position_embedding.num_embeddings,
-        'num_codebooks': model.num_codebooks, 
-        'vocab_size': model.vocab_size,
-        'cond_size': model.cond_size,
-        'num_classes': model.num_classes,
-    }, filepath)
-
-#-----------------------------------------------------
-
-def load_model(filepath, TransformerClass, device='cuda'):
-    checkpoint = torch.load(filepath, map_location=device)  
-    inf_context_length = checkpoint['inf_context_length'] # This is used to set the context length for the inference model
-    
-    model =  TransformerClass(
-        embed_size=checkpoint['embed_size'],
-        num_layers=checkpoint['num_layers'],
-        num_heads=checkpoint['num_heads'],
-        forward_expansion=checkpoint['forward_expansion'],
-        dropout=checkpoint['dropout'],
-        # This should be the training conext size size it affect the rotary positional encoding, not the conext length itself.
-        max_len=checkpoint['max_len'],
-        num_codebooks=checkpoint['num_codebooks'],
-        vocab_size=checkpoint['vocab_size'],
-        cond_size= checkpoint['cond_size'],
-        num_classes = checkpoint['num_classes']
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "inf_context_length": inf_context_length,
+            "embed_size": model.embed_size,
+            "num_layers": model.num_layers,  # len(model.layers),
+            "num_heads": model.num_heads,  #  model.layers[0].attention.num_heads,
+            "forward_expansion": model.forward_expansion,  # model.layers[0].feed_forward[0].out_features // model.embed_size,
+            "dropout": model.dropout,  # model.layers[0].dropout.p,
+            "max_len": model.max_len,  # model.position_embedding.num_embeddings,
+            "num_codebooks": model.num_codebooks,
+            "vocab_size": model.vocab_size,
+            "cond_size": model.cond_size,
+            "num_classes": model.num_classes,
+        },
+        filepath,
     )
-    model.load_state_dict(checkpoint['model_state_dict'])
+
+
+# -----------------------------------------------------
+
+
+def load_model(filepath, TransformerClass, device="cuda"):
+    checkpoint = torch.load(filepath, map_location=device)
+    inf_context_length = checkpoint[
+        "inf_context_length"
+    ]  # This is used to set the context length for the inference model
+
+    model = TransformerClass(
+        embed_size=checkpoint["embed_size"],
+        num_layers=checkpoint["num_layers"],
+        num_heads=checkpoint["num_heads"],
+        forward_expansion=checkpoint["forward_expansion"],
+        dropout=checkpoint["dropout"],
+        # This should be the training conext size size it affect the rotary positional encoding, not the conext length itself.
+        max_len=checkpoint["max_len"],
+        num_codebooks=checkpoint["num_codebooks"],
+        vocab_size=checkpoint["vocab_size"],
+        cond_size=checkpoint["cond_size"],
+        num_classes=checkpoint["num_classes"],
+    )
+    model.load_state_dict(checkpoint["model_state_dict"])
     optimizer = torch.optim.Adam(model.parameters())
-    optimizer.load_state_dict(checkpoint['optimizer_state_dict']) #also restored lr
-    
+    optimizer.load_state_dict(
+        checkpoint["optimizer_state_dict"]
+    )  # also restored lr
+
     model.eval()
-    return model, optimizer, inf_context_length, checkpoint['vocab_size'], checkpoint['num_codebooks'], checkpoint['cond_size'] # used for consructing the initial input window to the model
-    
-#----------------------------------------------------------------------    
+    return (
+        model,
+        optimizer,
+        inf_context_length,
+        checkpoint["vocab_size"],
+        checkpoint["num_codebooks"],
+        checkpoint["cond_size"],
+    )  # used for consructing the initial input window to the model
+
+
+# ----------------------------------------------------------------------
 # I´d like to get some better documentation on these DACFile params, but they are necessary for model.decompress(dacfile) to work
-# 
-def writeDACFile(fname, codeseq) :
-    with torch.no_grad(): 
+#
+def writeDACFile(fname, codeseq):
+    with torch.no_grad():
         dac_file = dac.DACFile(
-                codes=codeseq.cpu(),
-                chunk_length=codeseq.shape[2],
-                original_length=int(codeseq.shape[2]*512), 
-                input_db= torch.tensor(-20), #np.array([-20], dtype=np.float32),
-                channels=1,
-                sample_rate=44100,
-                padding=True,
-                dac_version='1.0.0'
-            )
-        
+            codes=codeseq.cpu(),
+            chunk_length=codeseq.shape[2],
+            original_length=int(codeseq.shape[2] * 512),
+            input_db=torch.tensor(-20),  # np.array([-20], dtype=np.float32),
+            channels=1,
+            sample_rate=44100,
+            padding=True,
+            dac_version="1.0.0",
+        )
+
         # Save to disk
         directory = os.path.dirname(fname)
         if not os.path.exists(directory):
             os.makedirs(directory)
-            print(f'Just so ya know, I had to create the path to save the file')
+            print("Just so ya know, I had to create the path to save the file")
         dac_file.save(fname + ".dac")
-        
+
 
 def generate_mask(sz, max_lookback):
     """
@@ -82,7 +100,7 @@ def generate_mask(sz, max_lookback):
     torch.Tensor: The attention mask.
     """
     # Full mask with all positions set to -inf initially
-    mask = torch.full((sz, sz), float('-inf'))
+    mask = torch.full((sz, sz), float("-inf"))
 
     # Fill the band of allowed positions with 0s
     for i in range(sz):
@@ -93,8 +111,8 @@ def generate_mask(sz, max_lookback):
     return mask
 
 
-
 #############################################
+
 
 def sample_top_n(logits, n):
     """
@@ -110,19 +128,28 @@ def sample_top_n(logits, n):
     batch_size, num_tokens, vocab_size = logits.shape
 
     # Get the top-n indices and values for each token independently
-    top_n_values, top_n_indices = torch.topk(logits, n, dim=-1)  # Shape: (batch_size, num_tokens, n)
+    top_n_values, top_n_indices = torch.topk(
+        logits, n, dim=-1
+    )  # Shape: (batch_size, num_tokens, n)
 
     # Convert top-n logits to probabilities using softmax
-    top_n_probs = torch.nn.functional.softmax(top_n_values, dim=-1) # Shape: (ntokens, topn)
+    top_n_probs = torch.nn.functional.softmax(
+        top_n_values, dim=-1
+    )  # Shape: (ntokens, topn)
 
     # Sample from the top-n probabilities for each token independently
-    sampled_idx = torch.multinomial(top_n_probs.view(batch_size * num_tokens, n), num_samples=1)  # Shape: (ntokens, 1)
+    sampled_idx = torch.multinomial(
+        top_n_probs.view(batch_size * num_tokens, n), num_samples=1
+    )  # Shape: (ntokens, 1)
 
     # Reshape back to (batch_size, num_tokens)
     sampled_idx = sampled_idx.view(batch_size, num_tokens)
 
     # Map sampled indices back to original vocabulary indices
-    return torch.gather(top_n_indices, -1, sampled_idx.unsqueeze(-1)).squeeze(-1)  # Shape: (batch_size, num_tokens)
+    return torch.gather(top_n_indices, -1, sampled_idx.unsqueeze(-1)).squeeze(
+        -1
+    )  # Shape: (batch_size, num_tokens)
+
 
 # # Example usage
 # batch_size, num_tokens, vocab_size = 2, 5, 10
@@ -138,28 +165,31 @@ def sample_top_n(logits, n):
 # The following are for creating sequences of parameters for inference
 # -----------------------------------------------------------------------
 
+
 def interpolate_vectors(v, s):
-    assert len(v) == len(s), "List of vectors and list of time indexes must be of the same length."
-    
+    assert len(v) == len(
+        s
+    ), "List of vectors and list of time indexes must be of the same length."
+
     n = len(v[0])  # Length of each vector
     m = s[-1] + 1  # Last element of s plus one
     result = torch.zeros((1, m, n))  # Initialize the result tensor with zeros
-    
+
     v_tensors = [torch.tensor(vec) for vec in v]
-    
+
     for i in range(len(s) - 1):
         start_idx = s[i]
         end_idx = s[i + 1]
         start_vec = v_tensors[i]
         end_vec = v_tensors[i + 1]
-        
+
         for j in range(start_idx, end_idx):
             t = (j - start_idx) / (end_idx - start_idx)
             result[0, j, :] = (1 - t) * start_vec + t * end_vec
-    
+
     # Set the last vector directly
     result[0, s[-1], :] = v_tensors[-1]
-    
+
     return result
 
 
@@ -169,20 +199,21 @@ def interpolate_vectors(v, s):
 # result_tensor = interpolate_vectors(v, s)
 # print(result_tensor)
 
+
 # -----------------------------------------------------------------------
 def breakpoints(allowed_keys, **kwargs):
     """
     Constructs a list of n tensors (rows) from keyword arguments.
     Meant to be interpreted as breakpoints in a time sequence
-    
+
     Args:
         allowed_keys (list of str): List of keys that determine the column order.
         **kwargs: Each key must be one of allowed_keys and have a value that is a list.
                   All lists must be the same length, n.
-                  
+
     Returns:
         list of torch.Tensor: A list of n tensors, each of shape [len(allowed_keys)].
-        
+
     Example:
         allowed_keys = ["a", "b", "param"]
         result = create_tensor_rows(allowed_keys, a=[1, 2, 3], param=[4, 5, 6])
@@ -199,7 +230,9 @@ def breakpoints(allowed_keys, **kwargs):
         elif len(value_list) != n:
             raise ValueError("All value lists must have the same length.")
     if n is None:
-        raise ValueError("No keyword arguments provided. At least one key must be specified.")
+        raise ValueError(
+            "No keyword arguments provided. At least one key must be specified."
+        )
 
     # Build the list of tensors (each tensor is one row).
     tensor_rows = []
@@ -214,6 +247,7 @@ def breakpoints(allowed_keys, **kwargs):
         tensor_rows.append(torch.tensor(row_values))
     return tensor_rows
 
+
 # -----------------------------------------------------------------------
 def timesegs(n):
     """
@@ -225,24 +259,24 @@ def timesegs(n):
 
     Args:
         n (int): Number of equal segments.
-    """    
-    step=1/n
-    stime=0
-    tlist=[0]
-    for i in range(1,n):
-        tlist.extend([i*step,i*step])
+    """
+    step = 1 / n
+    tlist = [0]
+    for i in range(1, n):
+        tlist.extend([i * step, i * step])
     tlist.extend([1])
     return tlist
-    
+
+
 # -----------------------------------------------------------------------
 def breakpoints_classseq(class_list, pvals, **kwargs):
     """
     Generates a conditioning sequence and corresponding time segments.
-    The idea is that the resulting times-stamped vector sequence will 
+    The idea is that the resulting times-stamped vector sequence will
     step through each class for an equal amount of time [normalized between [0,1])
 
     Args:
-        class_list (list): A list of class names. 
+        class_list (list): A list of class names.
         pvals (list): A list of values that will be appended to each tensor as its tail.
         **kwargs: Additional keyword arguments (currently not used).
 
@@ -267,24 +301,20 @@ def breakpoints_classseq(class_list, pvals, **kwargs):
          'vtimes': [0, 0.33, 0.33, 0.66, 0.66, 1]}
 
     """
-    numclasses=len(class_list)
-    vtimes=timesegs(numclasses)
-    m=len(pvals)
+    numclasses = len(class_list)
+    vtimes = timesegs(numclasses)
 
     vsequence = []
-    total_tensors = numclasses * 2
-    vec_length = numclasses 
+    vec_length = numclasses
 
-
-        # For each i from 0 to n-1, create two tensors.
+    # For each i from 0 to n-1, create two tensors.
     for i in range(numclasses):
         for j in range(2):
             t = torch.zeros(vec_length)
             # Set the "hot" position at index i.
             t[i] = 1.0
             # Set the last m elements to pval.
-            t=torch.cat([t , torch.tensor(pvals)])
+            t = torch.cat([t, torch.tensor(pvals)])
             vsequence.append(t)
 
-    return { 'vsequence': vsequence, 'vtimes': vtimes}
-    
+    return {"vsequence": vsequence, "vtimes": vtimes}
