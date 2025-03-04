@@ -1,0 +1,31 @@
+experiment: "test_combined"
+
+data_dir: "data/train_new"
+data_frames: "data/train_new.xlsx"
+validator_data_dir: "data/val_new"
+validator_data_frames: "data/val_new.xlsx"
+
+TransformerClass: "RopeCondDACTransformer" 
+vocab_size: 1024
+num_tokens: 4
+
+cond_params: 1 #1 (not counting the classes)
+model_size: 64 # must be divisible by num_heads
+
+Ti: 86 # 172 #86
+Tt: 831 # must match the length of the sequences in the batch
+batch_size: 4  #**
+
+
+num_layers: 4 #**
+num_heads: 8 # 8 # embed_size must be divisible by num_heads
+forward_expansion: 4 #4
+dropout_rate: 0.2
+learning_rate: 0.0005
+
+num_epochs: 200 ### 800 
+
+ErrorLogRate: 2 #2 ### 10
+checkpoint_interval: 50 # 25
+
+
