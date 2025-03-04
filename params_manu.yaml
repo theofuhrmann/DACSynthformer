@@ -1,31 +1,21 @@
-experiment: "test_combined"
+vocab_size: 1024 # dont mess with this
+num_tokens: 4 #codeblocks
 
-data_dir: "data/train_new"
-data_frames: "data/train_new.xlsx"
-validator_data_dir: "data/val_new"
-validator_data_frames: "data/val_new.xlsx"
+cond_params: 1 #1 (not counting the classes) not touch this!
+model_size: 128 # must be divisible by num_heads , you can change this! 128 works well
 
-TransformerClass: "RopeCondDACTransformer" 
-vocab_size: 1024
-num_tokens: 4
-
-cond_params: 1 #1 (not counting the classes)
-model_size: 64 # must be divisible by num_heads
-
-Ti: 86 # 172 #86
-Tt: 831 # must match the length of the sequences in the batch
-batch_size: 4  #**
+Ti: 86 # 172 #86 #size of the inference sliding window and mask
+Tt: 430 # must match the length of the sequences in the batch # length of the training data 430 samples 
+batch_size: 4   #**
 
 
-num_layers: 4 #**
-num_heads: 8 # 8 # embed_size must be divisible by num_heads
-forward_expansion: 4 #4
+num_layers: 2 #**  , number of transformer layers
+num_heads: 8 #8 # 8 # embed_size must be divisible by num_heads
+forward_expansion: 2 #4 #4 
 dropout_rate: 0.2
 learning_rate: 0.0005
 
-num_epochs: 200 ### 800 
+num_epochs: 300 ### 800 you can try 200
 
-ErrorLogRate: 2 #2 ### 10
-checkpoint_interval: 50 # 25
-
-
+ErrorLogRate: 2 #2 ### 10 # how often we log the errors 
+checkpoint_interval: 100 ###50 # 25 #how often we make a checkpoint
